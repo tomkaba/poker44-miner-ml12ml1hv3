@@ -62,14 +62,6 @@ def build_local_model_manifest(
         implementation_paths,
         repo_root=repo_root,
     )
-    implementation_sha256_override = os.getenv(
-        "POKER44_MODEL_IMPLEMENTATION_SHA256", ""
-    ).strip()
-    implementation_files_override = [
-        item.strip()
-        for item in os.getenv("POKER44_MODEL_IMPLEMENTATION_FILES", "").split(",")
-        if item.strip()
-    ]
     default_values = dict(defaults or {})
 
     manifest: Dict[str, Any] = {
@@ -98,10 +90,7 @@ def build_local_model_manifest(
             "POKER44_MODEL_REPO_URL",
             str(default_values.get("repo_url", "")),
         ).strip(),
-        "repo_commit": os.getenv(
-            "POKER44_MODEL_REPO_COMMIT",
-            str(default_values.get("repo_commit", "")),
-        ).strip(),
+        "repo_commit": str(default_values.get("repo_commit", "")).strip(),
         "artifact_url": os.getenv(
             "POKER44_MODEL_ARTIFACT_URL",
             str(default_values.get("artifact_url", "")),
@@ -141,9 +130,8 @@ def build_local_model_manifest(
             "POKER44_MODEL_INFERENCE_MODE",
             str(default_values.get("inference_mode", "remote")),
         ).strip(),
-        "implementation_sha256": implementation_sha256_override or implementation_sha256,
-        "implementation_files": implementation_files_override
-        or [
+        "implementation_sha256": implementation_sha256,
+        "implementation_files": [
             str(path.relative_to(repo_root)) if path.is_relative_to(repo_root) else str(path)
             for path in implementation_paths
         ],
